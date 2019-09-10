@@ -44,8 +44,8 @@ defmodule ExPropisju do
       80 => "восемьдесят",
       90 => "девяносто",
       # единицы, местами - c учетом рода
-      1 => %{1 => "один", 2 => 'одна', 3 => 'одно'},
-      2 => %{1 => "два", 2 => 'две', 3 => 'два'},
+      1 => %{1 => "один", 2 => "одна", 3 => "одно"},
+      2 => %{1 => "два", 2 => "две", 3 => "два"},
       3 => "три",
       4 => "четыре",
       5 => "пять",
@@ -54,9 +54,9 @@ defmodule ExPropisju do
       8 => "восемь",
       9 => "девять",
       :rub_integral => ["рубль", "рубля", "рублей"],
-      :rub_fraction => ['копейка', 'копейки', 'копеек'],
+      :rub_fraction => ["копейка", "копейки", "копеек"],
       :uah_integral => ["гривна", "гривны", "гривен"],
-      :uah_fraction => ['копейка', 'копейки', 'копеек'],
+      :uah_fraction => ["копейка", "копейки", "копеек"],
       :kzt_integral => ["тенге", "тенге", "тенге"],
       :kzt_fraction => ['тиын', 'тиына', 'тиынов'],
       :eur_integral => ["евро", "евро", "евро"],
@@ -358,6 +358,7 @@ defmodule ExPropisju do
     propisju_int(amount, 1, [], :ru)
     |> List.flatten()
     |> Enum.join(" ")
+    |> String.trim()
   end
 
   # def propisju(amount) when is_float(amount) do
@@ -499,6 +500,13 @@ defmodule ExPropisju do
         false -> value
       end
 
+    ones = case rest1 < 1 or rest1 > 1 do
+      true ->
+        value
+      false ->
+        ones
+    end
+
     # # индекс выбранной формы
     # chosen_ordinal = 2
     # единицы
@@ -525,16 +533,14 @@ defmodule ExPropisju do
     plural = [
       hundreds,
       tens,
-      value || ones,
+      ones,
       Enum.at(item_forms, chosen_ordinal)
     ]
 
     plural
     |> Enum.reject(fn x -> x == "" end)
     |> Enum.join(" ")
-    |> String.strip()
-
-    # plural
+    |> String.trim()
   end
 
   def zero?(0), do: true
